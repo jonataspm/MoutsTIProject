@@ -6,76 +6,74 @@ using Ambev.DeveloperEvaluation.Domain.Validation;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
-
 /// <summary>
 /// Represents a user in the system with authentication and profile information.
-/// This entity follows domain-driven design principles and includes business rules validation.
 /// </summary>
 public class User : BaseEntity, IUser
 {
     /// <summary>
-    /// Gets the user's full name.
-    /// Must not be null or empty and should contain both first and last names.
+    /// Gets or sets the username.
     /// </summary>
     public string Username { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the user's email address.
-    /// Must be a valid email format and is used as a unique identifier for authentication.
+    /// Gets or sets the user's email address.
     /// </summary>
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the user's phone number.
-    /// Must be a valid phone number format following the pattern (XX) XXXXX-XXXX.
+    /// Gets or sets the user's phone number.
     /// </summary>
-    public string Phone { get; set; } = string.Empty ;
+    public string Phone { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the hashed password for authentication.
-    /// Password must meet security requirements: minimum 8 characters, at least one uppercase letter,
-    /// one lowercase letter, one number, and one special character.
+    /// Gets or sets the hashed password for authentication.
     /// </summary>
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the user's role in the system.
-    /// Determines the user's permissions and access levels.
+    /// Gets or sets the user's display name split into parts.
     /// </summary>
-    public UserRole Role { get;     set; }
+    public Name Name { get; set; } = new();
 
     /// <summary>
-    /// Gets the user's current status.
-    /// Indicates whether the user is active, inactive, or blocked in the system.
+    /// Gets or sets the user's address.
+    /// </summary>
+    public Address Address { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the user's role.
+    /// </summary>
+    public UserRole Role { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user's current status.
     /// </summary>
     public UserStatus Status { get; set; }
 
     /// <summary>
-    /// Gets the date and time when the user was created.
+    /// Created timestamp.
     /// </summary>
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
-    /// Gets the date and time of the last update to the user's information.
+    /// Last update timestamp.
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 
     /// <summary>
-    /// Gets the unique identifier of the user.
+    /// IUser.Id implementation.
     /// </summary>
-    /// <returns>The user's ID as a string.</returns>
     string IUser.Id => Id.ToString();
 
     /// <summary>
-    /// Gets the username.
+    /// IUser.Username implementation.
     /// </summary>
-    /// <returns>The username.</returns>
     string IUser.Username => Username;
 
     /// <summary>
-    /// Gets the user's role in the system.
+    /// IUser.Role implementation.
     /// </summary>
-    /// <returns>The user's role as a string.</returns>
     string IUser.Role => Role.ToString();
 
     /// <summary>
