@@ -131,7 +131,7 @@ public class UsersController : BaseController
         var response = await _mediator.Send(command, cancellationToken);
         var mappedItems = _mapper.Map<List<ListUsersResponse>>(response.Data);
 
-        return OkPaginated(new PaginatedList<ListUsersResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.TotalPages), "List of users retrieved successfully");
+        return OkPaginated(new PaginatedList<ListUsersResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.PageSize), "List of users retrieved successfully");
     }
 
     [HttpPut("{id}")]

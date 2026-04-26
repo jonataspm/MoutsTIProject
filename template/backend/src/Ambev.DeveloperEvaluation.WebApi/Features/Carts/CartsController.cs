@@ -88,7 +88,7 @@ public class CartsController : BaseController
         var response = await _mediator.Send(command, cancellationToken);
         var mappedItems = _mapper.Map<List<ListCartsResponse>>(response.Data);
 
-        return OkPaginated(new PaginatedList<ListCartsResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.TotalPages), "List of carts retrieved successfully");
+        return OkPaginated(new PaginatedList<ListCartsResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.PageSize), "List of carts retrieved successfully");
     }
 
     [HttpPut("{id}")]
