@@ -24,7 +24,6 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleRe
     {
         var validator = new UpdateSaleValidator();
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
-
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
@@ -35,25 +34,45 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleRe
         if (existingSale.IsCancelled)
             throw new InvalidOperationException("Cannot modify a cancelled sale.");
 
-        existingSale.SaleNumber = command.SaleNumber;
-        existingSale.Date = command.Date;
         existingSale.CustomerId = command.CustomerId;
         existingSale.CustomerName = command.CustomerName;
         existingSale.BranchId = command.BranchId;
         existingSale.BranchName = command.BranchName;
+        existingSale.Date = command.Date;
 
-        existingSale.Items.Clear();
-        foreach (var itemDto in command.Items)
+        var itemsToRemove = existingSale.Items
+            .Where(ei => !command.Items.Any(ri => ri.ProductId == ei.ProductId))
+            .ToList();
+
+        foreach (var itemToRemove in itemsToRemove)
         {
-            existingSale.Items.Add(new SaleItem(itemDto.ProductId, itemDto.ProductName, itemDto.Quantity, itemDto.UnitPrice));
+            itemToRemove.Cancel();
+        }
+
+        foreach (var itemRequest in command.Items)
+        {
+            var existingItem = existingSale.Items
+                .FirstOrDefault(ei => ei.ProductId == itemRequest.ProductId);
+
+            if (existingItem != null)
+            {
+                existingItem.UpdateQuantity(itemRequest.Quantity);
+            }
+            else
+            {
+                existingSale.Items.Add(new SaleItem(
+                    itemRequest.ProductId,
+                    itemRequest.ProductName,
+                    itemRequest.Quantity,
+                    itemRequest.UnitPrice));
+            }
         }
 
         existingSale.CalculateTotal();
 
         var updatedSale = await _saleRepository.UpdateAsync(existingSale, cancellationToken);
 
-        _logger.LogInformation("EVENTO PUBLICADO: SaleModified - A venda {SaleNumber} (ID: {SaleId}) foi MODIFICADA com sucesso. Novo Valor Total: {TotalAmount}",
-            updatedSale.SaleNumber, updatedSale.Id, updatedSale.TotalAmount);
+        _logger.LogInformation("EVENTO PUBLICADO: SaleModified - Venda {SaleNumber} atualizada via Merge de Itens.", updatedSale.SaleNumber);
 
         return _mapper.Map<UpdateSaleResult>(updatedSale);
     }

@@ -7,7 +7,6 @@ public class UpdateSaleValidator : AbstractValidator<UpdateSaleCommand>
     public UpdateSaleValidator()
     {
         RuleFor(x => x.Id).NotEmpty().WithMessage("Sale ID is required");
-        RuleFor(x => x.SaleNumber).NotEmpty();
         RuleFor(x => x.Items).NotEmpty().WithMessage("A venda deve conter pelo menos um item.");
 
         RuleForEach(x => x.Items).ChildRules(item =>

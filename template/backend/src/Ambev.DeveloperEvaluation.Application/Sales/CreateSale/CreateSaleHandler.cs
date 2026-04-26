@@ -29,7 +29,12 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
             throw new ValidationException(validationResult.Errors);
 
         var sale = _mapper.Map<Sale>(command);
+
+        sale.SaleNumber = await _saleRepository.GenerateNextSaleNumberAsync(cancellationToken);
+        sale.Date = DateTime.UtcNow;
+
         sale.CalculateTotal();
+
         var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
 
         _logger.LogInformation("EVENTO PUBLICADO: SaleCreated - Venda {SaleNumber} gerada com ID {SaleId} para o cliente {CustomerName}. Valor Total: {TotalAmount}",

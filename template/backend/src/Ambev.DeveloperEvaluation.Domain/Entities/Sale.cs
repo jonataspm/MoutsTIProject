@@ -30,4 +30,14 @@ public class Sale : BaseEntity
         }
         TotalAmount = 0;
     }
+
+    public void CancelItem(Guid itemId)
+    {
+        var item = Items.FirstOrDefault(i => i.Id == itemId);
+        if (item == null)
+            throw new KeyNotFoundException($"Item {itemId} not found in this sale.");
+
+        item.Cancel();
+        CalculateTotal();
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Entities.Counters;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,5 +53,44 @@ public class SaleRepository : ISaleRepository
         _context.Sales.Remove(sale);
         await _context.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    public async Task<string> GenerateNextSaleNumberAsync(CancellationToken cancellationToken)
+    {
+        var today = DateTime.UtcNow.Date;
+        var datePrefix = today.ToString("yyyyMMdd");
+
+        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            var counter = await _context.SaleCounters
+                .FirstOrDefaultAsync(c => c.Date == today, cancellationToken);
+
+            int nextNumber;
+
+            if (counter == null)
+            {
+                nextNumber = 1;
+                counter = new SaleCounter { Date = today, LastNumber = nextNumber };
+                await _context.SaleCounters.AddAsync(counter, cancellationToken);
+            }
+            else
+            {
+                counter.LastNumber += 1;
+                nextNumber = counter.LastNumber;
+                _context.SaleCounters.Update(counter);
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return $"{datePrefix}{nextNumber:D4}";
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

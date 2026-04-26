@@ -35,11 +35,15 @@ public class SaleItem : BaseEntity
     {
         if (newQuantity > 20)
             throw new InvalidOperationException("Não é possível vender acima de 20 itens idênticos.");
-        if (newQuantity < 1)
-            throw new InvalidOperationException("A quantidade deve ser maior que zero.");
 
-        Quantity = newQuantity;
-        CalculateItemTotals();
+        if (newQuantity < 1)
+            Cancel();
+        else
+        {
+            IsCancelled = false;
+            Quantity = newQuantity;
+            CalculateItemTotals();
+        }
     }
 
     public void Cancel()

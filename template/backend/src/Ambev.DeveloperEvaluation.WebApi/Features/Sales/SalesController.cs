@@ -1,10 +1,12 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
+using Ambev.DeveloperEvaluation.Application.Sales.CancelSaleItem;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.ListSales;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelSaleItem;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSales;
@@ -120,5 +122,22 @@ public class SalesController : BaseController
         var mappedItems = _mapper.Map<List<ListSalesResponse>>(response.Data);
 
         return OkPaginated(new PaginatedList<ListSalesResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.PageSize), "Sales retrieved successfully");
+    }
+
+    [HttpDelete("{id}/items/{itemId}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CancelSaleItem([FromRoute] Guid id, [FromRoute] Guid itemId, CancellationToken cancellationToken)
+    {
+        var request = new CancelSaleItemRequest { Id = id, ItemId = itemId };
+        var validator = new CancelSaleItemRequestValidator();
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
+
+        var command = new CancelSaleItemCommand(id, itemId);
+        await _mediator.Send(command, cancellationToken);
+
+        return Ok("Item cancelled successfully");
     }
 }

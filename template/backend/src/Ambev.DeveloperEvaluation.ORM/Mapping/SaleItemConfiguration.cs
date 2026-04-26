@@ -10,6 +10,7 @@ public class SaleItemConfiguration : IEntityTypeConfiguration<SaleItem>
     {
         builder.ToTable("SaleItems");
         builder.HasKey(i => i.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(i => i.ProductId).IsRequired();
         builder.Property(i => i.ProductName).IsRequired().HasMaxLength(255);
         builder.Property(i => i.Quantity).IsRequired();
