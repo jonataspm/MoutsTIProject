@@ -97,4 +97,10 @@ public class UserRepository : IUserRepository
 
         return user;
     }
+
+    public async Task<User?> GetByUserNameAsync(string username, CancellationToken cancellationToken)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
 }

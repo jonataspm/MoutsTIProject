@@ -12,11 +12,9 @@ public class AuthenticateUserRequestValidator : AbstractValidator<AuthenticateUs
     /// </summary>
     public AuthenticateUserRequestValidator()
     {
-        RuleFor(x => x.Email)
+        RuleFor(x => x.UserName)
             .NotEmpty()
-            .WithMessage("Email is required")
-            .EmailAddress()
-            .WithMessage("Invalid email format");
+            .WithMessage("UserName is required");
 
         RuleFor(x => x.Password)
             .NotEmpty()
