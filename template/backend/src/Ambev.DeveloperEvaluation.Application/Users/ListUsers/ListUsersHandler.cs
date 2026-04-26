@@ -29,15 +29,12 @@ public class ListUsersHandler : IRequestHandler<ListUsersCommand, PaginatedResul
 
         var mapped = _mapper.Map<IEnumerable<ListUserResult>>(users);
 
-        var totalItems = users.Count();
-        var totalPages = command.Size == 0 ? 0 : (int)Math.Ceiling((double)totalUsers / command.Size.Value);
-
         return new PaginatedResult<ListUserResult>
         {
             Data = mapped,
-            TotalItems = totalItems,
+            TotalItems = totalUsers,
             CurrentPage = command.Page.Value,
-            TotalPages = totalPages
+            PageSize = command.Size.Value
         };
     }
 }
