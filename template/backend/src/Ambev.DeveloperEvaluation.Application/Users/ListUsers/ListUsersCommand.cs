@@ -1,9 +1,10 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Enums;
+﻿using Ambev.DeveloperEvaluation.Common.Data;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Users.ListUsers;
 
-public class ListUsersCommand : IRequest<ListUsersResult>
+public class ListUsersCommand : IRequest<PaginatedResult<ListUserResult>>
 {
     public int? Page { get; set; } = 1;
 
