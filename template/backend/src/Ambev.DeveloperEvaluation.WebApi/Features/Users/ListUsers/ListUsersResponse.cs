@@ -1,9 +1,9 @@
 using Ambev.DeveloperEvaluation.Application.Dtos;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Users.GetUser;
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Users.ListUsers;
 
-public class GetUserResponse
+public class ListUsersResponse
 {
     public Guid Id { get; set; }
     public string Email { get; set; } = string.Empty;
@@ -12,6 +12,6 @@ public class GetUserResponse
     public NameDto Name { get; set; } = new();
     public AddressDto Address { get; set; } = new();
     public string Phone { get; set; } = string.Empty;
-    public UserStatus Status { get; set; }
     public UserRole Role { get; set; }
+    public UserStatus Status { get; set; }
 }
