@@ -11,7 +11,7 @@ public class ListUsersProfile : Profile
 {
     public ListUsersProfile()
     {
-        CreateMap<User, ListUserItemResult>()
+        CreateMap<User, ListUserResult>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))

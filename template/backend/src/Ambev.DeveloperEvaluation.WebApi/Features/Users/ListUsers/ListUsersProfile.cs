@@ -12,9 +12,9 @@ public class ListUsersProfile : Profile
     public ListUsersProfile()
     {
         CreateMap<ListUsersRequest, Application.Users.ListUsers.ListUsersCommand>();
-        CreateMap<Application.Users.ListUsers.ListUserItemResult, ListUsersResponse>();
+        CreateMap<Application.Users.ListUsers.ListUserResult, ListUsersResponse>();
 
-        CreateMap<User, Application.Users.ListUsers.ListUserItemResult>()
+        CreateMap<User, Application.Users.ListUsers.ListUserResult>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))

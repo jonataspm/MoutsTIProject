@@ -3,18 +3,7 @@ using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Application.Users.ListUsers;
 
-public class ListUsersResult
-{
-    public IEnumerable<ListUserItemResult> Data { get; set; } = new List<ListUserItemResult>();
-
-    public int TotalItems { get; set; }
-
-    public int CurrentPage { get; set; }
-
-    public int TotalPages { get; set; }
-}
-
-public class ListUserItemResult
+public class ListUserResult
 {
     public Guid Id { get; set; }
 

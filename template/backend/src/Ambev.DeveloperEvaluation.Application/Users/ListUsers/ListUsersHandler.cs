@@ -1,11 +1,12 @@
-﻿using AutoMapper;
-using MediatR;
-using FluentValidation;
+﻿using Ambev.DeveloperEvaluation.Common.Data;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using AutoMapper;
+using FluentValidation;
+using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Users.ListUsers;
 
-public class ListUsersHandler : IRequestHandler<ListUsersCommand, ListUsersResult>
+public class ListUsersHandler : IRequestHandler<ListUsersCommand, PaginatedResult<ListUserResult>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
@@ -16,7 +17,7 @@ public class ListUsersHandler : IRequestHandler<ListUsersCommand, ListUsersResul
         _mapper = mapper;
     }
 
-    public async Task<ListUsersResult> Handle(ListUsersCommand command, CancellationToken cancellationToken)
+    public async Task<PaginatedResult<ListUserResult>> Handle(ListUsersCommand command, CancellationToken cancellationToken)
     {
         var validator = new ListUsersValidator();
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
@@ -26,12 +27,12 @@ public class ListUsersHandler : IRequestHandler<ListUsersCommand, ListUsersResul
 
         var (users, totalUsers) = await _userRepository.GetPagedAsync(command.Page.Value, command.Size.Value, command.Order, cancellationToken);
 
-        var mapped = _mapper.Map<IEnumerable<ListUserItemResult>>(users);
+        var mapped = _mapper.Map<IEnumerable<ListUserResult>>(users);
 
         var totalItems = users.Count();
         var totalPages = command.Size == 0 ? 0 : (int)Math.Ceiling((double)totalUsers / command.Size.Value);
 
-        return new ListUsersResult
+        return new PaginatedResult<ListUserResult>
         {
             Data = mapped,
             TotalItems = totalItems,
