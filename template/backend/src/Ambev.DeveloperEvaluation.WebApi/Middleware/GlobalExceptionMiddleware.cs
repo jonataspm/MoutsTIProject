@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using Ambev.DeveloperEvaluation.Common.Validation;
+using Ambev.DeveloperEvaluation.WebApi.Common;
 using FluentValidation;
+using System.Text.Json;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Middleware;
 
@@ -28,22 +30,22 @@ public class GlobalExceptionMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        var (statusCode, type, error, detail) = exception switch
+        var (statusCode, message, errors) = exception switch
         {
-            ValidationException vex => (StatusCodes.Status400BadRequest, "ValidationError", "Validation Failed", string.Join(" | ", vex.Errors.Select(e => e.ErrorMessage))),
-            KeyNotFoundException knf => (StatusCodes.Status404NotFound, "ResourceNotFound", knf.Message, knf.Message),
-            UnauthorizedAccessException ua => (StatusCodes.Status401Unauthorized, "AuthenticationError", ua.Message, ua.Message),
-            InvalidOperationException ioe => (StatusCodes.Status400BadRequest, "InvalidOperation", ioe.Message, ioe.Message),
-            _ => (StatusCodes.Status500InternalServerError, "ServerError", "An unexpected error occurred", "An unexpected error occurred, try again in a few minutes")
+            ValidationException vex => (StatusCodes.Status400BadRequest, "Validation Failed", vex.Errors.Select(error => (ValidationErrorDetail)error)),
+            KeyNotFoundException knf => (StatusCodes.Status404NotFound, knf.Message, default),
+            UnauthorizedAccessException ua => (StatusCodes.Status401Unauthorized, ua.Message, default),
+            InvalidOperationException ioe => (StatusCodes.Status400BadRequest, ioe.Message, default),
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred, try again in a few minutes", default)
         };
 
         context.Response.StatusCode = statusCode;
 
-        var payload = new
+        var payload = new ApiResponse
         {
-            type,
-            error,
-            detail
+            Success = false,
+            Message = message,
+            Errors = errors,
         };
 
         var jsonOptions = new JsonSerializerOptions

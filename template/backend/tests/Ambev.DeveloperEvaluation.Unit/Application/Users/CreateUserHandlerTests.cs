@@ -6,9 +6,10 @@ using Ambev.DeveloperEvaluation.Unit.Domain;
 using AutoMapper;
 using FluentAssertions;
 using NSubstitute;
+using System.Threading;
 using Xunit;
 
-namespace Ambev.DeveloperEvaluation.Unit.Application;
+namespace Ambev.DeveloperEvaluation.Unit.Application.Users;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CreateUserHandler"/> class.
@@ -48,7 +49,10 @@ public class CreateUserHandlerTests
             Email = command.Email,
             Phone = command.Phone,
             Status = command.Status,
-            Role = command.Role
+            Role = command.Role,
+            Name = { Firstname = command.Name.Firstname, Lastname = command.Name.Lastname },
+            Address = { Street = command.Address.Street, City = command.Address.City, Number = command.Address.Number, Zipcode = command.Address.Zipcode, 
+                Geolocation = { Lat = command.Address.Geolocation.Lat, Long = command.Address.Geolocation.Long } }
         };
 
         var result = new CreateUserResult
@@ -60,8 +64,8 @@ public class CreateUserHandlerTests
         _mapper.Map<User>(command).Returns(user);
         _mapper.Map<CreateUserResult>(user).Returns(result);
 
-        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>())
-            .Returns(user);
+        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>()).Returns(user);
+        _userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         _passwordHasher.HashPassword(Arg.Any<string>()).Returns("hashedPassword");
 
         // When
@@ -107,7 +111,10 @@ public class CreateUserHandlerTests
             Email = command.Email,
             Phone = command.Phone,
             Status = command.Status,
-            Role = command.Role
+            Role = command.Role,
+            Name = { Firstname = command.Name.Firstname, Lastname = command.Name.Lastname },
+            Address = { Street = command.Address.Street, City = command.Address.City, Number = command.Address.Number, Zipcode = command.Address.Zipcode,
+                Geolocation = { Lat = command.Address.Geolocation.Lat, Long = command.Address.Geolocation.Long } }
         };
 
         _mapper.Map<User>(command).Returns(user);

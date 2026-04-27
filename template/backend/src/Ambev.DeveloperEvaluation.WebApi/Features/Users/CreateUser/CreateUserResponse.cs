@@ -18,7 +18,7 @@ public class CreateUserResponse
     /// </summary>
     public string Email { get; set; } = string.Empty;
     
-    public string UserName { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public NameDto Name { get; set; } = new();
     public AddressDto Address { get; set; } = new();
