@@ -2,7 +2,7 @@
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
-public class Cart : BaseEntity
+public class Cart : BaseEntityMongo
 {
     public Guid UserId { get; set; }
     public DateTime Date { get; set; }

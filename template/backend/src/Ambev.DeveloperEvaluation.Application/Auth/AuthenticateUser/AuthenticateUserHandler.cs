@@ -25,7 +25,7 @@ namespace Ambev.DeveloperEvaluation.Application.Auth.AuthenticateUser
 
         public async Task<AuthenticateUserResult> Handle(AuthenticateUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByUserNameAsync(request.UserName, cancellationToken);
+            var user = await _userRepository.GetByUserNameAsync(request.Username, cancellationToken);
             
             if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.Password))
             {

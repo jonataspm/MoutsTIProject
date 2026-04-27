@@ -100,7 +100,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByUserNameAsync(string username, CancellationToken cancellationToken)
     {
-        return await _context.Users
+        return await _context.Users.AsNoTracking()
             .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
     }
 }

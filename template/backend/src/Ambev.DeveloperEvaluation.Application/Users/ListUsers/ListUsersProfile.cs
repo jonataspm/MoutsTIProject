@@ -21,8 +21,8 @@ public class ListUsersProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
         CreateMap<Name, NameDto > ()
-            .ForMember(d => d.FirstName, o => o.MapFrom(s => s.Firstname))
-            .ForMember(d => d.LastName, o => o.MapFrom(s => s.Lastname));
+            .ForMember(d => d.Firstname, o => o.MapFrom(s => s.Firstname))
+            .ForMember(d => d.Lastname, o => o.MapFrom(s => s.Lastname));
 
         CreateMap<Geolocation, GeolocationDto>()
             .ForMember(d => d.Lat, o => o.MapFrom(s => s.Lat))

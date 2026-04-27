@@ -16,8 +16,8 @@ public static class ActiveUserSpecificationTestData
     /// The generated users will have valid:
     /// - Email (valid format)
     /// - Password (meeting complexity requirements)
-    /// - FirstName
-    /// - LastName
+    /// - Firstname
+    /// - Lastname
     /// - Phone (Brazilian format)
     /// - Role (User)
     /// Status is not set here as it's the main test parameter
