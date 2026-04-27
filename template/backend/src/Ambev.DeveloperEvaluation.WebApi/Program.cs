@@ -4,8 +4,11 @@ using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.IoC;
+using Ambev.DeveloperEvaluation.WebApi.Extensions;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text.Json.Serialization;
 
@@ -32,9 +35,35 @@ public class Program
 
             builder.AddBasicHealthChecks();
 
-            builder.Services.AddSwaggerGen(c =>
+            builder.Services.AddSwaggerGen(options =>
             {
-                c.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
+                options.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"Insira o token JWT desta maneira: Bearer {seu_token}. 
+                      Exemplo: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -55,17 +84,16 @@ public class Program
 
             var app = builder.Build();
 
+            app.ApplyMigration();
             app.UseMiddleware<GlobalExceptionMiddleware>();
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection(); // Disabled for container environments without certificates
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -74,12 +102,22 @@ public class Program
 
             app.MapControllers();
 
-            app.Run();
+            Log.Information("Application starting HTTP server on ports 8080/8081");
+            try
+            {
+                Log.Information("Calling app.Run()");
+                app.Run();
+                Log.Information("app.Run() completed normally");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error during app.Run()");
+                throw;
+            }
         }
         catch (Exception ex)
         {
             Log.Fatal(ex, "Application terminated unexpectedly");
-            Console.ReadLine();
         }
         finally
         {

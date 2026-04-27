@@ -25,7 +25,7 @@ public class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
         RuleFor(x => x.Address.Street).NotEmpty().When(x => x.Address != null);
         RuleFor(x => x.Address.Number).GreaterThan(0).When(x => x.Address != null);
         RuleFor(x => x.Address.Zipcode)
-            .Matches(@"^\d{5}-\d{3}$")
+            .Matches(@"^\d{5}-?\d{3}$")
             .When(x => x.Address != null && !string.IsNullOrEmpty(x.Address.Zipcode));
 
         RuleFor(x => x.Address.Geolocation).NotNull().When(x => x.Address != null);

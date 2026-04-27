@@ -66,6 +66,27 @@ public class UsersController : BaseController
         });
     }
 
+    [HttpGet("")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(PaginatedResponse<ListUsersResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken, [FromQuery] string? _order, [FromQuery] int? _page = 1, [FromQuery] int? _size = 10)
+    {
+        var request = new ListUsersRequest { Page = _page, Size = _size, Order = _order };
+        var validator = new ListUsersRequestValidator();
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
+
+        var command = _mapper.Map<ListUsersCommand>(request);
+        var response = await _mediator.Send(command, cancellationToken);
+        var mappedItems = _mapper.Map<List<ListUsersResponse>>(response.Data);
+
+        return OkPaginated(new PaginatedList<ListUsersResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.PageSize), "List of users retrieved successfully");
+    }
+
     /// <summary>
     /// Retrieves a user by their ID
     /// </summary>
@@ -73,7 +94,7 @@ public class UsersController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The user details if found</returns>
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponseWithData<GetUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -90,27 +111,6 @@ public class UsersController : BaseController
         var response = await _mediator.Send(command, cancellationToken);
 
         return Ok(_mapper.Map<GetUserResponse>(response), "User retrieved successfully");
-    }
-
-    [HttpGet("")]
-    [Authorize]
-    [ProducesResponseType(typeof(PaginatedResponse<ListUsersResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken, [FromQuery] string? _order, [FromQuery] int? _page = 1, [FromQuery] int? _size = 10)
-    {
-        var request = new ListUsersRequest { Page = _page, Size = _size, Order = _order};
-        var validator = new ListUsersRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
-
-        var command = _mapper.Map<ListUsersCommand>(request);
-        var response = await _mediator.Send(command, cancellationToken);
-        var mappedItems = _mapper.Map<List<ListUsersResponse>>(response.Data);
-
-        return OkPaginated(new PaginatedList<ListUsersResponse>(mappedItems, response.TotalItems, response.CurrentPage, response.PageSize), "List of users retrieved successfully");
     }
 
     [HttpPut("{id}")]
