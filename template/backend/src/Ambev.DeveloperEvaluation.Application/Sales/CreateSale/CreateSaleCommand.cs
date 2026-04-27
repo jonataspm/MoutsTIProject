@@ -10,5 +10,5 @@ public record CreateSaleCommand : IRequest<CreateSaleResult>
     public string CustomerName { get; init; } = string.Empty;
     public Guid BranchId { get; init; }
     public string BranchName { get; init; } = string.Empty;
-    public List<SaleItemDto> Items { get; init; } = [];
+    public List<SaleItemDto> Items { get; init; } = new List<SaleItemDto>();
 }
